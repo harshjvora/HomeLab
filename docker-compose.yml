@@ -27,6 +27,7 @@
           - C:\HomeLab\Plex\media:/data
           - C:\HomeLab\Plex\transcode:/transcode
         restart: unless-stopped
+      
       jackett:
         image: ghcr.io/linuxserver/jackett
         container_name: jackett
@@ -41,5 +42,39 @@
           - C:\HomeLab\Jackett\downloads:/downloads
         ports:
           - 9117:9117
+        restart: unless-stopped
+        
+      deluge:
+        image: ghcr.io/linuxserver/deluge
+        container_name: deluge
+        environment:
+          - PUID=1000
+          - PGID=1000
+          - TZ=America/New_York
+          - DELUGE_LOGLEVEL=error #optional
+        volumes:
+          - C:\HomeLab/Deluge/config:/config
+          - C:\HomeLab/downloads:/downloads
+        ports:
+          - 8112:8112
+          - 6881:6881
+          - 6881:6881/udp
+      
+      sonarr:
+        image: ghcr.io/linuxserver/sonarr
+        container_name: sonarr
+        environment:
+          - PUID=1000
+          - PGID=1000
+          - TZ=America/New_York
+        volumes:
+          - C:\HomeLab\Sonarr\config:/config
+          - C:\HomeLab\Plex\media\TV:/tv #optional
+          - C:\HomeLab\Sonarr\downloadclient-downloads:/downloads #optional
+        links:
+          - jackett:jackett
+          - deluge:deluge
+        ports:
+          - 8989:8989
         restart: unless-stopped
 
